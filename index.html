@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time in the Zone</title>
+    <meta name="description" content="Timezone converter for Mindera offices worldwide. View current time across all office locations with work hours indicators.">
+    <title>Time in the Zones - Mindera Office Time Converter</title>
     <style>
         * {
             margin: 0;
@@ -257,6 +258,26 @@
             background: rgba(59, 130, 246, 0.15);
             color: #3b82f6;
             border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .btn:focus,
+        .time-input:focus,
+        .office-select:focus,
+        .toggle-info:focus {
+            outline: 2px solid #FFD700;
+            outline-offset: 2px;
         }
 
         .section-title {
@@ -551,7 +572,9 @@
 
         function toggleInfo() {
             const info = document.getElementById('usage-info');
-            info.classList.toggle('show');
+            const button = document.querySelector('.toggle-info');
+            const isExpanded = info.classList.toggle('show');
+            button.setAttribute('aria-expanded', isExpanded);
         }
 
         function applyCustomTime() {
@@ -1004,11 +1027,11 @@
                     card.innerHTML = `
                         <div class="country-name">${country.country}</div>
                         <div class="office-cities">${citiesList}</div>
-                        <div class="office-time-display">${time}</div>
+                        <div class="office-time-display" aria-label="Time in ${country.country}">${time}</div>
                         <div class="office-date-display">${date}</div>
                         <div>
-                            <span class="offset">${offset}</span>
-                            <span class="time-indicator ${timeStatus.status}">${timeStatus.label}</span>
+                            <span class="offset" aria-label="Timezone offset">${offset}</span>
+                            <span class="time-indicator ${timeStatus.status}" aria-label="Time status: ${timeStatus.label}">${timeStatus.label}</span>
                         </div>
                     `;
 
@@ -1028,8 +1051,8 @@
                             <div class="city-row">
                                 <div class="city-name">${city.name}</div>
                                 <div>
-                                    <span class="city-time">${time}</span>
-                                    <span class="time-indicator ${timeStatus.status}" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; margin-left: 0.5rem;">${timeStatus.label}</span>
+                                    <span class="city-time" aria-label="Time in ${city.name}">${time}</span>
+                                    <span class="time-indicator ${timeStatus.status}" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; margin-left: 0.5rem;" aria-label="Time status: ${timeStatus.label}">${timeStatus.label}</span>
                                 </div>
                             </div>
                         `;
