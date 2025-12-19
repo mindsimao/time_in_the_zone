@@ -241,6 +241,99 @@
             margin-bottom: 2rem;
         }
 
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 6px;
+            color: #FFD700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: #FFD700;
+            transform: translateY(-1px);
+        }
+
+        .info-box {
+            background: rgba(255, 215, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-box h3 {
+            color: #FFD700;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-box li {
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .info-box li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #FFD700;
+        }
+
+        .info-box code {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #FFD700;
+        }
+
+        .toggle-info {
+            background: transparent;
+            border: none;
+            color: #888;
+            font-size: 0.85rem;
+            cursor: pointer;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .toggle-info:hover {
+            color: #FFD700;
+        }
+
+        .info-content {
+            display: none;
+        }
+
+        .info-content.show {
+            display: block;
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 2rem;
@@ -264,6 +357,24 @@
         </header>
 
         <div id="error-container"></div>
+
+        <div class="controls">
+            <button class="btn" onclick="clearParams()">🔄 Show Current Time</button>
+            <button class="toggle-info" onclick="toggleInfo()">ℹ️ How to use query parameters</button>
+        </div>
+
+        <div class="info-box info-content" id="usage-info">
+            <h3>Query Parameter Usage</h3>
+            <ul>
+                <li><code>?time=14:30</code> - Show specific time (uses today's date)</li>
+                <li><code>?time=2025-12-25T14:30</code> - Show specific date and time</li>
+                <li><code>?timezone=America/New_York</code> - Change reference timezone</li>
+                <li><code>?time=14:30&timezone=Asia/Kolkata</code> - Combine both parameters</li>
+            </ul>
+            <p style="color: #666; font-size: 0.85rem; margin-top: 1rem;">
+                Click the current URL to copy it, then modify the parameters to set a specific time or timezone.
+            </p>
+        </div>
         
         <div class="reference-time">
             <h2 id="reference-title">Reference Time</h2>
@@ -279,12 +390,19 @@
         <div class="timezone-grid" id="remote-grid"></div>
 
         <footer>
-            <p>Pass time as query parameter: ?time=14:30 or ?time=2025-01-15T14:30</p>
-            <p>Change timezone: ?time=14:30&timezone=America/New_York</p>
+            <p style="margin-bottom: 0.5rem;">Share a specific time by copying the URL with query parameters</p>
         </footer>
     </div>
 
     <script>
+        function clearParams() {
+            window.location.href = window.location.pathname;
+        }
+
+        function toggleInfo() {
+            const info = document.getElementById('usage-info');
+            info.classList.toggle('show');
+        }
         const officeTimezones = [
             { 
                 country: 'Portugal', 
