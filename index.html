@@ -396,10 +396,11 @@
                 <li><code>?time=14:30</code> - Show specific time (uses today's date)</li>
                 <li><code>?time=2025-12-25T14:30</code> - Show specific date and time</li>
                 <li><code>?timezone=America/New_York</code> - Change reference timezone</li>
-                <li><code>?time=14:30&timezone=Asia/Kolkata</code> - Combine both parameters</li>
+                <li><code>?office=India</code> - Use office location as reference (Portugal, India, Brazil, etc.)</li>
+                <li><code>?time=14:30&office=Morocco</code> - Combine time and office parameters</li>
             </ul>
             <p style="color: #666; font-size: 0.85rem; margin-top: 1rem;">
-                Click the current URL to copy it, then modify the parameters to set a specific time or timezone.
+                Using <code>?office=</code> parameter will also highlight that office location.
             </p>
         </div>
         
@@ -577,9 +578,23 @@
             const params = new URLSearchParams(window.location.search);
             const timeParam = params.get('time');
             const timezoneParam = params.get('timezone') || params.get('tz');
+            const officeParam = params.get('office');
+            
+            // Handle office parameter
+            let selectedTimezone = timezoneParam;
+            if (officeParam && !timezoneParam) {
+                const officeIndex = officeTimezones.findIndex(
+                    office => office.country.toLowerCase() === officeParam.toLowerCase()
+                );
+                if (officeIndex !== -1) {
+                    selectedTimezone = officeTimezones[officeIndex].cities[0].tz;
+                    // Also set this as nearest for highlighting
+                    nearestOfficeIndex = officeIndex;
+                }
+            }
             
             if (!timeParam) {
-                return { date: new Date(), timezone: timezoneParam || 'Europe/Lisbon' };
+                return { date: new Date(), timezone: selectedTimezone || 'Europe/Lisbon' };
             }
 
             // Try to parse different time formats
@@ -608,7 +623,7 @@
                 throw new Error('Invalid time format. Use HH:MM, YYYY-MM-DDTHH:MM, or ISO 8601 format.');
             }
 
-            return { date: referenceDate, timezone: timezoneParam || 'Europe/Lisbon' };
+            return { date: referenceDate, timezone: selectedTimezone || 'Europe/Lisbon' };
         }
 
         function formatTime(date, timezone) {
@@ -691,20 +706,26 @@
 
         // Try to get user location
         if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    nearestOfficeIndex = findNearestOffice(
-                        position.coords.latitude,
-                        position.coords.longitude
-                    );
-                    // Re-render to highlight nearest office
-                    displayTimes();
-                },
-                (error) => {
-                    // Silently fail - just don't highlight any office
-                    console.log('Location access denied or unavailable');
-                }
-            );
+            const params = new URLSearchParams(window.location.search);
+            const officeParam = params.get('office');
+            
+            // Only use geolocation if office parameter is not specified
+            if (!officeParam) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        nearestOfficeIndex = findNearestOffice(
+                            position.coords.latitude,
+                            position.coords.longitude
+                        );
+                        // Re-render to highlight nearest office
+                        displayTimes();
+                    },
+                    (error) => {
+                        // Silently fail - just don't highlight any office
+                        console.log('Location access denied or unavailable');
+                    }
+                );
+            }
         }
 
         function displayTimes() {
