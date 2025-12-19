@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time in the Zones</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #0a0a0a;
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid #FFD700;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            color: #888;
+            margin-top: 0.5rem;
+        }
+
+        .reference-time {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .reference-time h2 {
+            font-size: 1.2rem;
+            color: #FFD700;
+            margin-bottom: 0.5rem;
+        }
+
+        .reference-time .time {
+            font-size: 2rem;
+            font-weight: 600;
+        }
+
+        .timezone-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .timezone-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .timezone-card:hover {
+            border-color: #FFD700;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2);
+        }
+
+        .timezone-card.office {
+            border-color: rgba(255, 215, 0, 0.3);
+            background: #1f1f1f;
+        }
+
+        .remote-country-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .remote-country-card:hover {
+            border-color: #FFD700;
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.1);
+        }
+
+        .country-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #FFD700;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .city-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .city-row:last-child {
+            border-bottom: none;
+        }
+
+        .city-name {
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .city-time {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #ffffff;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timezone-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #FFD700;
+            margin-bottom: 0.5rem;
+        }
+
+        .timezone-location {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 1rem;
+        }
+
+        .timezone-time {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ffffff;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timezone-date {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        .offset {
+            display: inline-block;
+            margin-top: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            background: rgba(255, 215, 0, 0.15);
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #FFD700;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #FFD700;
+            margin: 2rem 0 1.5rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #2a2a2a;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #ff6b6b;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .timezone-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .reference-time .time {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Time in the Zones</h1>
+            <p class="subtitle">Convert and view time across multiple timezones</p>
+        </header>
+
+        <div id="error-container"></div>
+        
+        <div class="reference-time">
+            <h2>Reference Time (Portugal)</h2>
+            <div class="timezone-location">Porto, Coimbra, Aveiro, Lisboa</div>
+            <div class="time" id="reference-time">--:--:--</div>
+            <div class="timezone-date" id="reference-date">---</div>
+        </div>
+
+        <h2 class="section-title">Office Locations</h2>
+        <div class="timezone-grid" id="office-grid"></div>
+
+        <h2 class="section-title">Remote Timezones</h2>
+        <div class="timezone-grid" id="remote-grid"></div>
+
+        <footer>
+            <p>Pass time as query parameter: ?time=14:30 or ?time=2025-01-15T14:30</p>
+        </footer>
+    </div>
+
+    <script>
+        const timezones = [
+            { name: 'United Kingdom', location: 'Leicester', tz: 'Europe/London', office: true },
+            { name: 'United Kingdom', location: 'London', tz: 'Europe/London', office: true },
+            { name: 'Romania', location: 'Cluj-Napoca', tz: 'Europe/Bucharest', office: true },
+            { name: 'India', location: 'Chennai (Kotturpuram)', tz: 'Asia/Kolkata', office: true },
+            { name: 'India', location: 'Chennai (Thiruvanmiyur)', tz: 'Asia/Kolkata', office: true },
+            { name: 'India', location: 'Bengaluru', tz: 'Asia/Kolkata', office: true },
+            { name: 'Brazil', location: 'Blumenau', tz: 'America/Sao_Paulo', office: true },
+            { name: 'United States', location: 'Los Angeles', tz: 'America/Los_Angeles', office: true },
+            { name: 'Morocco', location: 'Casablanca', tz: 'Africa/Casablanca', office: true },
+            { name: 'Vietnam', location: 'Ho Chi Minh', tz: 'Asia/Ho_Chi_Minh', office: true },
+            { name: 'Australia', location: 'Melbourne', tz: 'Australia/Melbourne', office: true }
+        ];
+
+        const remoteTimezones = [
+            { 
+                country: 'Spain', 
+                cities: [
+                    { name: 'Madrid', tz: 'Europe/Madrid' },
+                    { name: 'Barcelona', tz: 'Europe/Madrid' }
+                ]
+            },
+            { 
+                country: 'United Kingdom', 
+                cities: [
+                    { name: 'Edinburgh', tz: 'Europe/London' },
+                    { name: 'Manchester', tz: 'Europe/London' }
+                ]
+            },
+            { 
+                country: 'Romania', 
+                cities: [
+                    { name: 'Bucharest', tz: 'Europe/Bucharest' }
+                ]
+            },
+            { 
+                country: 'India', 
+                cities: [
+                    { name: 'Mumbai', tz: 'Asia/Kolkata' },
+                    { name: 'Delhi', tz: 'Asia/Kolkata' },
+                    { name: 'Hyderabad', tz: 'Asia/Kolkata' }
+                ]
+            },
+            { 
+                country: 'Brazil', 
+                cities: [
+                    { name: 'São Paulo (UTC-3)', tz: 'America/Sao_Paulo' },
+                    { name: 'Rio de Janeiro (UTC-3)', tz: 'America/Sao_Paulo' },
+                    { name: 'Brasília (UTC-3)', tz: 'America/Sao_Paulo' },
+                    { name: 'Manaus (UTC-4)', tz: 'America/Manaus' },
+                    { name: 'Rio Branco (UTC-5)', tz: 'America/Rio_Branco' }
+                ]
+            },
+            { 
+                country: 'United States', 
+                cities: [
+                    { name: 'New York (EST)', tz: 'America/New_York' },
+                    { name: 'Chicago (CST)', tz: 'America/Chicago' },
+                    { name: 'Denver (MST)', tz: 'America/Denver' }
+                ]
+            },
+            { 
+                country: 'Morocco', 
+                cities: [
+                    { name: 'Rabat', tz: 'Africa/Casablanca' }
+                ]
+            },
+            { 
+                country: 'Vietnam', 
+                cities: [
+                    { name: 'Hanoi', tz: 'Asia/Bangkok' }
+                ]
+            },
+            { 
+                country: 'Australia', 
+                cities: [
+                    { name: 'Sydney (UTC+11)', tz: 'Australia/Sydney' },
+                    { name: 'Canberra (UTC+11)', tz: 'Australia/Sydney' },
+                    { name: 'Brisbane (UTC+10)', tz: 'Australia/Brisbane' }
+                ]
+            }
+        ];
+
+        function getTimeFromURL() {
+            const params = new URLSearchParams(window.location.search);
+            const timeParam = params.get('time');
+            
+            if (!timeParam) {
+                return new Date();
+            }
+
+            // Try to parse different time formats
+            let referenceDate;
+            
+            // Format: HH:MM or HH:MM:SS
+            if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(timeParam)) {
+                const now = new Date();
+                const [hours, minutes, seconds = '0'] = timeParam.split(':');
+                referenceDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 
+                    parseInt(hours), parseInt(minutes), parseInt(seconds));
+            }
+            // Format: ISO 8601 (YYYY-MM-DDTHH:MM:SS or similar)
+            else if (timeParam.includes('T') || timeParam.includes('-')) {
+                referenceDate = new Date(timeParam);
+            }
+            // Try to parse as timestamp
+            else if (!isNaN(timeParam)) {
+                referenceDate = new Date(parseInt(timeParam));
+            }
+            else {
+                referenceDate = new Date(timeParam);
+            }
+
+            if (isNaN(referenceDate.getTime())) {
+                throw new Error('Invalid time format. Use HH:MM, YYYY-MM-DDTHH:MM, or ISO 8601 format.');
+            }
+
+            return referenceDate;
+        }
+
+        function formatTime(date, timezone) {
+            return new Intl.DateTimeFormat('en-GB', {
+                timeZone: timezone,
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }).format(date);
+        }
+
+        function formatDate(date, timezone) {
+            return new Intl.DateTimeFormat('en-GB', {
+                timeZone: timezone,
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            }).format(date);
+        }
+
+        function getOffset(date, timezone) {
+            const formatter = new Intl.DateTimeFormat('en-US', {
+                timeZone: timezone,
+                timeZoneName: 'short'
+            });
+            const parts = formatter.formatToParts(date);
+            const tzName = parts.find(part => part.type === 'timeZoneName')?.value || '';
+            return tzName;
+        }
+
+        function displayTimes() {
+            try {
+                const referenceDate = getTimeFromURL();
+                const portugalTz = 'Europe/Lisbon';
+
+                // Display reference time
+                document.getElementById('reference-time').textContent = formatTime(referenceDate, portugalTz);
+                document.getElementById('reference-date').textContent = formatDate(referenceDate, portugalTz);
+
+                // Display office and remote timezones separately
+                const officeGrid = document.getElementById('office-grid');
+                const remoteGrid = document.getElementById('remote-grid');
+                officeGrid.innerHTML = '';
+                remoteGrid.innerHTML = '';
+
+                // Display office locations
+                timezones.forEach(tz => {
+                    const card = document.createElement('div');
+                    card.className = 'timezone-card office';
+                    
+                    const time = formatTime(referenceDate, tz.tz);
+                    const date = formatDate(referenceDate, tz.tz);
+                    const offset = getOffset(referenceDate, tz.tz);
+
+                    card.innerHTML = `
+                        <div class="timezone-name">${tz.name}</div>
+                        <div class="timezone-location">${tz.location}</div>
+                        <div class="timezone-time">${time}</div>
+                        <div class="timezone-date">${date}</div>
+                        <div class="offset">${offset}</div>
+                    `;
+
+                    officeGrid.appendChild(card);
+                });
+
+                // Display remote locations grouped by country
+                remoteTimezones.forEach(country => {
+                    const card = document.createElement('div');
+                    card.className = 'remote-country-card';
+                    
+                    let citiesHTML = '';
+                    country.cities.forEach(city => {
+                        const time = formatTime(referenceDate, city.tz);
+                        citiesHTML += `
+                            <div class="city-row">
+                                <div class="city-name">${city.name}</div>
+                                <div class="city-time">${time}</div>
+                            </div>
+                        `;
+                    });
+
+                    card.innerHTML = `
+                        <div class="country-name">${country.country}</div>
+                        ${citiesHTML}
+                    `;
+
+                    remoteGrid.appendChild(card);
+                });
+
+                document.getElementById('error-container').innerHTML = '';
+            } catch (error) {
+                document.getElementById('error-container').innerHTML = `
+                    <div class="error">${error.message}</div>
+                `;
+            }
+        }
+
+        // Initialize on load
+        displayTimes();
+
+        // Update every second if no time parameter is provided
+        if (!new URLSearchParams(window.location.search).get('time')) {
+            setInterval(displayTimes, 1000);
+        }
+    </script>
+</body>
+</html>
