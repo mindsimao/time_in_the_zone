@@ -307,6 +307,7 @@
             gap: 1rem;
             margin-bottom: 2rem;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .btn {
@@ -326,6 +327,68 @@
             background: rgba(255, 215, 0, 0.2);
             border-color: #FFD700;
             transform: translateY(-1px);
+        }
+
+        .time-picker-container {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .time-input {
+            padding: 0.5rem 0.75rem;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .time-input:focus {
+            outline: none;
+            border-color: #FFD700;
+            background: #1f1f1f;
+        }
+
+        .time-input::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+
+        .office-select {
+            padding: 0.5rem 0.75rem;
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 6px;
+            color: #FFD700;
+            font-size: 0.9rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .office-select:focus {
+            outline: none;
+            border-color: #FFD700;
+            background: #1f1f1f;
+        }
+
+        .office-select option {
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+
+        .btn-apply {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: #FFD700;
+        }
+
+        .btn-apply:hover {
+            background: #FFD700;
+            color: #0a0a0a;
         }
 
         .info-box {
@@ -419,6 +482,23 @@
         <div id="error-container"></div>
 
         <div class="controls">
+            <div class="time-picker-container">
+                <input type="date" id="date-picker" class="time-input" />
+                <input type="time" id="time-picker" class="time-input" step="1" />
+                <select id="office-select" class="office-select">
+                    <option value="">Portugal (Default)</option>
+                    <option value="Portugal">Portugal</option>
+                    <option value="United Kingdom">United Kingdom</option>
+                    <option value="Romania">Romania</option>
+                    <option value="India">India</option>
+                    <option value="Brazil">Brazil</option>
+                    <option value="United States">United States</option>
+                    <option value="Morocco">Morocco</option>
+                    <option value="Vietnam">Vietnam</option>
+                    <option value="Australia">Australia</option>
+                </select>
+                <button class="btn btn-apply" onclick="applyCustomTime()">Apply</button>
+            </div>
             <button class="btn" onclick="clearParams()">Show Current Time</button>
             <button class="toggle-info" onclick="toggleInfo()">How to use query parameters</button>
         </div>
@@ -467,6 +547,59 @@
             const info = document.getElementById('usage-info');
             info.classList.toggle('show');
         }
+
+        function applyCustomTime() {
+            const date = document.getElementById('date-picker').value;
+            const time = document.getElementById('time-picker').value;
+            const office = document.getElementById('office-select').value;
+
+            if (!date && !time && !office) {
+                // Nothing selected, clear params
+                clearParams();
+                return;
+            }
+
+            const params = new URLSearchParams();
+            
+            if (date && time) {
+                // Combine date and time into ISO format
+                params.set('time', `${date}T${time}`);
+            } else if (time) {
+                // Just time
+                params.set('time', time);
+            }
+            
+            if (office) {
+                params.set('office', office);
+            }
+
+            window.location.href = `${window.location.pathname}?${params.toString()}`;
+        }
+
+        function initializePickers() {
+            const params = new URLSearchParams(window.location.search);
+            const timeParam = params.get('time');
+            const officeParam = params.get('office');
+
+            if (timeParam) {
+                if (timeParam.includes('T')) {
+                    // ISO format with date
+                    const [date, time] = timeParam.split('T');
+                    document.getElementById('date-picker').value = date;
+                    document.getElementById('time-picker').value = time;
+                } else if (timeParam.includes(':')) {
+                    // Just time
+                    document.getElementById('time-picker').value = timeParam;
+                }
+            }
+
+            if (officeParam) {
+                document.getElementById('office-select').value = officeParam;
+            }
+        }
+
+        // Initialize pickers on load
+        initializePickers();
         const officeTimezones = [
             { 
                 country: 'Portugal', 
