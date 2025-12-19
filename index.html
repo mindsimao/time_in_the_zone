@@ -93,6 +93,20 @@
             background: #1f1f1f;
         }
 
+        .office-country-card {
+            background: #1f1f1f;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 8px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .office-country-card:hover {
+            border-color: #FFD700;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2);
+        }
+
         .remote-country-card {
             background: #1a1a1a;
             border: 1px solid #2a2a2a;
@@ -113,6 +127,30 @@
             margin-bottom: 1rem;
             padding-bottom: 0.5rem;
             border-bottom: 1px solid #2a2a2a;
+        }
+
+        .office-country-card .country-name {
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .office-time-display {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #ffffff;
+            font-variant-numeric: tabular-nums;
+            margin: 1rem 0;
+        }
+
+        .office-date-display {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .office-cities {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 0.75rem;
         }
 
         .city-row {
@@ -228,8 +266,7 @@
         <div id="error-container"></div>
         
         <div class="reference-time">
-            <h2>Reference Time (Portugal)</h2>
-            <div class="timezone-location">Porto, Coimbra, Aveiro, Lisboa</div>
+            <h2>Reference Time</h2>
             <div class="time" id="reference-time">--:--:--</div>
             <div class="timezone-date" id="reference-date">---</div>
         </div>
@@ -246,18 +283,66 @@
     </div>
 
     <script>
-        const timezones = [
-            { name: 'United Kingdom', location: 'Leicester', tz: 'Europe/London', office: true },
-            { name: 'United Kingdom', location: 'London', tz: 'Europe/London', office: true },
-            { name: 'Romania', location: 'Cluj-Napoca', tz: 'Europe/Bucharest', office: true },
-            { name: 'India', location: 'Chennai (Kotturpuram)', tz: 'Asia/Kolkata', office: true },
-            { name: 'India', location: 'Chennai (Thiruvanmiyur)', tz: 'Asia/Kolkata', office: true },
-            { name: 'India', location: 'Bengaluru', tz: 'Asia/Kolkata', office: true },
-            { name: 'Brazil', location: 'Blumenau', tz: 'America/Sao_Paulo', office: true },
-            { name: 'United States', location: 'Los Angeles', tz: 'America/Los_Angeles', office: true },
-            { name: 'Morocco', location: 'Casablanca', tz: 'Africa/Casablanca', office: true },
-            { name: 'Vietnam', location: 'Ho Chi Minh', tz: 'Asia/Ho_Chi_Minh', office: true },
-            { name: 'Australia', location: 'Melbourne', tz: 'Australia/Melbourne', office: true }
+        const officeTimezones = [
+            { 
+                country: 'Portugal', 
+                cities: [
+                    { name: 'Porto', tz: 'Europe/Lisbon' },
+                    { name: 'Coimbra', tz: 'Europe/Lisbon' },
+                    { name: 'Aveiro', tz: 'Europe/Lisbon' }
+                ]
+            },
+            { 
+                country: 'United Kingdom', 
+                cities: [
+                    { name: 'Leicester', tz: 'Europe/London' },
+                    { name: 'London', tz: 'Europe/London' }
+                ]
+            },
+            { 
+                country: 'Romania', 
+                cities: [
+                    { name: 'Cluj-Napoca', tz: 'Europe/Bucharest' }
+                ]
+            },
+            { 
+                country: 'India', 
+                cities: [
+                    { name: 'Chennai (Kotturpuram)', tz: 'Asia/Kolkata' },
+                    { name: 'Chennai (Thiruvanmiyur)', tz: 'Asia/Kolkata' },
+                    { name: 'Bengaluru', tz: 'Asia/Kolkata' }
+                ]
+            },
+            { 
+                country: 'Brazil', 
+                cities: [
+                    { name: 'Blumenau', tz: 'America/Sao_Paulo' }
+                ]
+            },
+            { 
+                country: 'United States', 
+                cities: [
+                    { name: 'Los Angeles', tz: 'America/Los_Angeles' }
+                ]
+            },
+            { 
+                country: 'Morocco', 
+                cities: [
+                    { name: 'Casablanca', tz: 'Africa/Casablanca' }
+                ]
+            },
+            { 
+                country: 'Vietnam', 
+                cities: [
+                    { name: 'Ho Chi Minh', tz: 'Asia/Ho_Chi_Minh' }
+                ]
+            },
+            { 
+                country: 'Australia', 
+                cities: [
+                    { name: 'Melbourne', tz: 'Australia/Melbourne' }
+                ]
+            }
         ];
 
         const remoteTimezones = [
@@ -411,20 +496,24 @@
                 officeGrid.innerHTML = '';
                 remoteGrid.innerHTML = '';
 
-                // Display office locations
-                timezones.forEach(tz => {
+                // Display office locations grouped by country
+                officeTimezones.forEach(country => {
                     const card = document.createElement('div');
-                    card.className = 'timezone-card office';
+                    card.className = 'office-country-card';
                     
-                    const time = formatTime(referenceDate, tz.tz);
-                    const date = formatDate(referenceDate, tz.tz);
-                    const offset = getOffset(referenceDate, tz.tz);
+                    // Use the first city's timezone for the country (they should all be the same)
+                    const tz = country.cities[0].tz;
+                    const time = formatTime(referenceDate, tz);
+                    const date = formatDate(referenceDate, tz);
+                    const offset = getOffset(referenceDate, tz);
+                    
+                    const citiesList = country.cities.map(c => c.name).join(', ');
 
                     card.innerHTML = `
-                        <div class="timezone-name">${tz.name}</div>
-                        <div class="timezone-location">${tz.location}</div>
-                        <div class="timezone-time">${time}</div>
-                        <div class="timezone-date">${date}</div>
+                        <div class="country-name">${country.country}</div>
+                        <div class="office-cities">${citiesList}</div>
+                        <div class="office-time-display">${time}</div>
+                        <div class="office-date-display">${date}</div>
                         <div class="offset">${offset}</div>
                     `;
 
