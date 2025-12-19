@@ -226,6 +226,39 @@
             color: #FFD700;
         }
 
+        .time-indicator {
+            display: inline-block;
+            margin-left: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .time-indicator.work-hours {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .time-indicator.off-hours {
+            background: rgba(234, 179, 8, 0.15);
+            color: #eab308;
+            border: 1px solid rgba(234, 179, 8, 0.3);
+        }
+
+        .time-indicator.night {
+            background: rgba(147, 51, 234, 0.15);
+            color: #9333ea;
+            border: 1px solid rgba(147, 51, 234, 0.3);
+        }
+
+        .time-indicator.weekend {
+            background: rgba(59, 130, 246, 0.15);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
         .section-title {
             font-size: 1.5rem;
             font-weight: 600;
@@ -711,6 +744,36 @@
             return tzName;
         }
 
+        function getTimeStatus(date, timezone) {
+            const formatter = new Intl.DateTimeFormat('en-US', {
+                timeZone: timezone,
+                weekday: 'short',
+                hour: 'numeric',
+                minute: 'numeric',
+                hour12: false
+            });
+            
+            const parts = formatter.formatToParts(date);
+            const weekday = parts.find(p => p.type === 'weekday')?.value;
+            const hour = parseInt(parts.find(p => p.type === 'hour')?.value);
+            
+            // Check if weekend
+            if (weekday === 'Sat' || weekday === 'Sun') {
+                return { status: 'weekend', label: 'Weekend' };
+            }
+            
+            // Check time of day
+            if (hour >= 9 && hour < 18) {
+                return { status: 'work-hours', label: 'Work Hours' };
+            } else if (hour >= 18 && hour < 22) {
+                return { status: 'off-hours', label: 'Evening' };
+            } else if (hour >= 6 && hour < 9) {
+                return { status: 'off-hours', label: 'Early Morning' };
+            } else {
+                return { status: 'night', label: 'Night' };
+            }
+        }
+
         function calculateDistance(lat1, lon1, lat2, lon2) {
             const R = 6371; // Earth's radius in km
             const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -795,6 +858,7 @@
                     const time = formatTime(referenceDate, tz);
                     const date = formatDate(referenceDate, tz);
                     const offset = getOffset(referenceDate, tz);
+                    const timeStatus = getTimeStatus(referenceDate, tz);
                     
                     const citiesList = country.cities.map(c => c.name).join(', ');
 
@@ -803,7 +867,10 @@
                         <div class="office-cities">${citiesList}</div>
                         <div class="office-time-display">${time}</div>
                         <div class="office-date-display">${date}</div>
-                        <div class="offset">${offset}</div>
+                        <div>
+                            <span class="offset">${offset}</span>
+                            <span class="time-indicator ${timeStatus.status}">${timeStatus.label}</span>
+                        </div>
                     `;
 
                     officeGrid.appendChild(card);
@@ -817,10 +884,14 @@
                     let citiesHTML = '';
                     country.cities.forEach(city => {
                         const time = formatTime(referenceDate, city.tz);
+                        const timeStatus = getTimeStatus(referenceDate, city.tz);
                         citiesHTML += `
                             <div class="city-row">
                                 <div class="city-name">${city.name}</div>
-                                <div class="city-time">${time}</div>
+                                <div>
+                                    <span class="city-time">${time}</span>
+                                    <span class="time-indicator ${timeStatus.status}" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; margin-left: 0.5rem;">${timeStatus.label}</span>
+                                </div>
                             </div>
                         `;
                     });
