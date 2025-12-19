@@ -607,47 +607,44 @@
             
             // Format: HH:MM or HH:MM:SS
             if (/^\d{1,2}:\d{2}(:\d{2})?$/.test(timeParam)) {
-                // When time is specified with office, interpret it in that office's timezone
+                // Create a time that when displayed in referenceTimezone shows the specified time
                 const now = new Date();
                 const [hours, minutes, seconds = '0'] = timeParam.split(':');
                 
-                // Create a date in the reference timezone
-                const baseDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 
-                    parseInt(hours), parseInt(minutes), parseInt(seconds));
+                // Create a string in ISO format for the reference timezone
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const isoString = `${year}-${month}-${day}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
                 
-                // Get the current offset for the reference timezone
+                // Parse as if it's in the reference timezone
+                // We need to create a Date that when formatted in referenceTimezone shows our desired time
+                const tempDate = new Date(isoString);
+                
+                // Get what time it currently shows in the reference timezone
                 const formatter = new Intl.DateTimeFormat('en-US', {
                     timeZone: referenceTimezone,
                     year: 'numeric',
-                    month: 'numeric',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    second: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
                     hour12: false
                 });
                 
-                // Create date in reference timezone by parsing back
-                const parts = formatter.formatToParts(baseDate);
-                const tzDate = new Date(
-                    parseInt(parts.find(p => p.type === 'year').value),
-                    parseInt(parts.find(p => p.type === 'month').value) - 1,
-                    parseInt(parts.find(p => p.type === 'day').value),
-                    parseInt(hours),
-                    parseInt(minutes),
-                    parseInt(seconds || '0')
-                );
+                const parts = formatter.formatToParts(tempDate);
+                const tzHour = parseInt(parts.find(p => p.type === 'hour').value);
+                const tzMinute = parseInt(parts.find(p => p.type === 'minute').value);
+                const tzSecond = parseInt(parts.find(p => p.type === 'second').value);
                 
-                // Calculate offset difference
-                const localOffset = baseDate.getTimezoneOffset();
-                const targetFormatter = new Intl.DateTimeFormat('en-US', {
-                    timeZone: referenceTimezone,
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    timeZoneName: 'short'
-                });
+                // Calculate the difference between what we want and what we got
+                const wantedMinutes = parseInt(hours) * 60 + parseInt(minutes);
+                const gotMinutes = tzHour * 60 + tzMinute;
+                const diffMinutes = wantedMinutes - gotMinutes;
                 
-                referenceDate = baseDate;
+                // Adjust the date by the difference
+                referenceDate = new Date(tempDate.getTime() + diffMinutes * 60 * 1000);
             }
             // Format: ISO 8601 (YYYY-MM-DDTHH:MM:SS or similar)
             else if (timeParam.includes('T') || timeParam.includes('-')) {
