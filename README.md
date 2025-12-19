@@ -21,6 +21,11 @@ A timezone converter application that displays time across multiple Mindera offi
   - Australia: Melbourne
 - **Remote Timezones**: Additional cities grouped by country for remote workers
 - **Geolocation**: Automatically highlights your nearest Mindera office
+- **Work Hours Indicators**: Visual badges showing time status for each location
+  - 🟢 **Work Hours** (9 AM - 6 PM weekdays) - Green
+  - 🟡 **Early Morning** (6 AM - 9 AM) / **Evening** (6 PM - 10 PM) - Yellow
+  - 🟣 **Night** (10 PM - 6 AM) - Purple
+  - 🔵 **Weekend** (Saturday/Sunday) - Blue
 - **Query Parameters**: Share specific times via URL parameters
 - **Live Updates**: Time updates every second when viewing current time
 - **Responsive Design**: Works on desktop and mobile devices
@@ -90,6 +95,11 @@ The application features a dark theme with gold accents inspired by Mindera's br
 - **Office Locations**: Highlighted with gold borders and enhanced styling
 - **Remote Timezones**: Grouped by country for cleaner organization
 - **Nearest Office**: Automatically detected via geolocation with special badge
+- **Work Hours Indicators**: Color-coded badges for instant status recognition
+  - Green for work hours (best time to collaborate)
+  - Yellow for early morning/evening (might be available)
+  - Purple for night time (avoid contacting unless urgent)
+  - Blue for weekends (off days)
 - **Hover Effects**: Smooth transitions and visual feedback
 - **Responsive Grid**: Adapts to different screen sizes
 
@@ -108,12 +118,23 @@ Share a URL with your proposed meeting time to help teammates see it in their ti
 ```
 ?time=14:00&office=Portugal
 ```
+The work hours indicators will instantly show who's in working hours and who's not.
 
 ### Quick Time Reference
-Keep the page open to quickly check current time across all Mindera offices.
+Keep the page open to quickly check current time across all Mindera offices and see who's available for real-time collaboration.
 
 ### Async Communication Planning
-Check when teams in other offices start/end their workday to optimize communication timing.
+- Check when teams in other offices start/end their workday
+- See which offices are in "Work Hours" (green badge) for immediate responses
+- Identify "Evening" or "Night" zones to plan async communication
+- Respect weekend time (blue badge) by scheduling non-urgent messages for Monday
+
+### Before Sending a Message
+Quickly glance at the time status:
+- **Green (Work Hours)**: Good time to reach out
+- **Yellow (Early/Evening)**: They might be available, but check first
+- **Purple (Night)**: Send async, expect response later
+- **Blue (Weekend)**: Wait until Monday unless urgent
 
 ## Privacy
 
