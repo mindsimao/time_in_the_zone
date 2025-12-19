@@ -26,11 +26,24 @@ A timezone converter application that displays time across multiple Mindera offi
   - 🟡 **Early Morning** (6 AM - 9 AM) / **Evening** (6 PM - 10 PM) - Yellow
   - 🟣 **Night** (10 PM - 6 AM) - Purple
   - 🔵 **Weekend** (Saturday/Sunday) - Blue
+- **Date & Time Picker**: Built-in UI for selecting custom dates, times, and reference timezones
 - **Query Parameters**: Share specific times via URL parameters
 - **Live Updates**: Time updates every second when viewing current time
 - **Responsive Design**: Works on desktop and mobile devices
 
 ## Usage
+
+### Interactive Date & Time Picker
+
+The easiest way to explore different times:
+
+1. **Select a date** using the date picker (optional - defaults to today)
+2. **Select a time** using the time picker
+3. **Choose an office** from the dropdown to use as reference timezone
+4. **Click "Apply"** to update the view
+5. **Click "Reset Filters"** to return to current time + Portugal timezone
+
+The URL will automatically update with your selections, making it easy to share.
 
 ### View Current Time
 Simply open the page:
@@ -119,6 +132,13 @@ Share a URL with your proposed meeting time to help teammates see it in their ti
 ?time=14:00&office=Portugal
 ```
 The work hours indicators will instantly show who's in working hours and who's not.
+
+**OR** use the date/time picker:
+1. Select your proposed meeting date and time
+2. Choose your office from the dropdown
+3. Click "Apply"
+4. Check the work hours badges - look for green!
+5. Share the URL with invitees
 
 ### Quick Time Reference
 Keep the page open to quickly check current time across all Mindera offices and see who's available for real-time collaboration.

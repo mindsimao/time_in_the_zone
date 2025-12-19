@@ -22,13 +22,27 @@ View time across all Mindera offices:
 - **Vietnam** (Ho Chi Minh)
 - **Australia** (Melbourne)
 
-### 2. **Nearest Office Detection**
+### 2. **Work Hours Indicators**
+Each location shows a color-coded badge indicating the time status:
+- 🟢 **Work Hours** (9 AM - 6 PM weekdays) - Best time to collaborate
+- 🟡 **Early Morning/Evening** (6-9 AM or 6-10 PM) - Might be available
+- 🟣 **Night** (10 PM - 6 AM) - Avoid unless urgent
+- 🔵 **Weekend** (Saturday/Sunday) - Off days
+
+### 3. **Date & Time Picker**
+Use the built-in picker to:
+- Select a specific date and time
+- Choose a reference office/timezone
+- See what time it will be everywhere at that moment
+- Click "Reset Filters" to return to current time
+
+### 4. **Nearest Office Detection**
 When you first visit, the app will ask for location permission. If granted, it automatically highlights your nearest Mindera office with a "Nearest Office" badge.
 
-### 3. **Remote Timezone Reference**
+### 5. **Remote Timezone Reference**
 Additional cities are grouped by country for remote workers in different timezones (major cities and capitals).
 
-### 4. **Share Specific Times**
+### 6. **Share Specific Times**
 Use URL parameters to share specific meeting times with your team:
 
 #### Basic Examples:
@@ -44,23 +58,37 @@ Use URL parameters to share specific meeting times with your team:
 ## 🎯 Common Use Cases
 
 ### Scheduling a Meeting
-1. Pick a time in your timezone
-2. Add `?time=14:00&office=YourCountry` to the URL
-3. Share the link with your team - they'll instantly see what time it is for them
+1. Use the date/time picker to select your proposed meeting time
+2. Choose your office from the dropdown
+3. Click "Apply" to see the time across all zones
+4. Check the work hours indicators - green badges mean good timing!
+5. Share the URL with your team
 
 ### Quick Time Check
 - Just visit the site to see current time across all offices
+- Green badges show who's currently in work hours
 - Your nearest office is automatically highlighted
 
 ### Planning Async Communication
-- Check when teams in other offices start/end their day
+- Check the work hours indicators before sending messages
+- Avoid purple (night) and blue (weekend) unless urgent
+- Use yellow (early/evening) with caution
 - Share a URL with a specific time to propose a meeting
+
+### Before Sending a Slack Message
+Just glance at the badges:
+- **Green**: Go ahead, they're working
+- **Yellow**: They might be available
+- **Purple**: Send async, they'll respond later
+- **Blue**: It's the weekend, wait until Monday
 
 ## 💡 Tips
 
 - **Bookmark it** - Add to your browser bookmarks for quick access
 - **Pin the tab** - Keep it open during your workday
-- **Share URLs** - Use query parameters to communicate meeting times clearly
+- **Use the pickers** - Easier than manually editing URLs
+- **Share URLs** - Send the link with your proposed time
+- **Check the colors** - Respect work-life balance across timezones
 - **No installation needed** - It's just a web page, works everywhere
 
 ## 🛠 Technical Details
@@ -70,6 +98,7 @@ Use URL parameters to share specific meeting times with your team:
 - Updates every second when showing current time
 - Respects browser timezone settings
 - Uses Intl.DateTimeFormat API for accurate timezone conversion
+- Native date/time pickers for easy interaction
 
 ---
 
