@@ -222,6 +222,32 @@
             border-bottom: 1px solid #2a2a2a;
         }
 
+        .section-title a {
+            color: #FFD700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .section-title a:hover {
+            color: #FFA500;
+        }
+
+        .section-title a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+            transition: width 0.3s ease;
+        }
+
+        .section-title a:hover::after {
+            width: 100%;
+        }
+
         footer {
             text-align: center;
             margin-top: 3rem;
@@ -383,7 +409,7 @@
             <div class="timezone-date" id="reference-date">---</div>
         </div>
 
-        <h2 class="section-title">Office Locations</h2>
+        <h2 class="section-title"><a href="https://mindera.com" title="Link to Mindera Website">Mindera</a> Office Locations</h2>
         <div class="timezone-grid" id="office-grid"></div>
 
         <h2 class="section-title">Remote Timezones</h2>
