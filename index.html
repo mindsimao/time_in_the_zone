@@ -499,7 +499,7 @@
                 </select>
                 <button class="btn btn-apply" onclick="applyCustomTime()">Apply</button>
             </div>
-            <button class="btn" onclick="clearParams()">Show Current Time</button>
+            <button class="btn" onclick="clearParams()">Reset Filters</button>
             <button class="toggle-info" onclick="toggleInfo()">How to use query parameters</button>
         </div>
 
@@ -540,6 +540,12 @@
 
     <script>
         function clearParams() {
+            // Clear the pickers
+            document.getElementById('date-picker').value = '';
+            document.getElementById('time-picker').value = '';
+            document.getElementById('office-select').value = '';
+            
+            // Redirect to default (no params)
             window.location.href = window.location.pathname;
         }
 
