@@ -266,7 +266,8 @@
         <div id="error-container"></div>
         
         <div class="reference-time">
-            <h2>Reference Time</h2>
+            <h2 id="reference-title">Reference Time</h2>
+            <div class="timezone-location" id="reference-location">Portugal (Porto, Coimbra, Aveiro, Lisboa)</div>
             <div class="time" id="reference-time">--:--:--</div>
             <div class="timezone-date" id="reference-date">---</div>
         </div>
@@ -279,6 +280,7 @@
 
         <footer>
             <p>Pass time as query parameter: ?time=14:30 or ?time=2025-01-15T14:30</p>
+            <p>Change timezone: ?time=14:30&timezone=America/New_York</p>
         </footer>
     </div>
 
@@ -417,9 +419,10 @@
         function getTimeFromURL() {
             const params = new URLSearchParams(window.location.search);
             const timeParam = params.get('time');
+            const timezoneParam = params.get('timezone') || params.get('tz');
             
             if (!timeParam) {
-                return new Date();
+                return { date: new Date(), timezone: timezoneParam || 'Europe/Lisbon' };
             }
 
             // Try to parse different time formats
@@ -448,7 +451,7 @@
                 throw new Error('Invalid time format. Use HH:MM, YYYY-MM-DDTHH:MM, or ISO 8601 format.');
             }
 
-            return referenceDate;
+            return { date: referenceDate, timezone: timezoneParam || 'Europe/Lisbon' };
         }
 
         function formatTime(date, timezone) {
@@ -471,6 +474,23 @@
             }).format(date);
         }
 
+        function getTimezoneLabel(tz) {
+            const labels = {
+                'Europe/Lisbon': 'Portugal (Porto, Coimbra, Aveiro, Lisboa)',
+                'Europe/London': 'United Kingdom',
+                'Europe/Bucharest': 'Romania',
+                'Asia/Kolkata': 'India',
+                'America/Sao_Paulo': 'Brazil',
+                'America/Los_Angeles': 'United States (Pacific)',
+                'America/New_York': 'United States (Eastern)',
+                'Africa/Casablanca': 'Morocco',
+                'Asia/Ho_Chi_Minh': 'Vietnam',
+                'Australia/Melbourne': 'Australia',
+                'Europe/Madrid': 'Spain'
+            };
+            return labels[tz] || tz;
+        }
+
         function getOffset(date, timezone) {
             const formatter = new Intl.DateTimeFormat('en-US', {
                 timeZone: timezone,
@@ -483,12 +503,12 @@
 
         function displayTimes() {
             try {
-                const referenceDate = getTimeFromURL();
-                const portugalTz = 'Europe/Lisbon';
+                const { date: referenceDate, timezone: referenceTimezone } = getTimeFromURL();
 
                 // Display reference time
-                document.getElementById('reference-time').textContent = formatTime(referenceDate, portugalTz);
-                document.getElementById('reference-date').textContent = formatDate(referenceDate, portugalTz);
+                document.getElementById('reference-location').textContent = getTimezoneLabel(referenceTimezone);
+                document.getElementById('reference-time').textContent = formatTime(referenceDate, referenceTimezone);
+                document.getElementById('reference-date').textContent = formatDate(referenceDate, referenceTimezone);
 
                 // Display office and remote timezones separately
                 const officeGrid = document.getElementById('office-grid');
