@@ -101,10 +101,23 @@
             transition: all 0.3s ease;
         }
 
-        .office-country-card:hover {
+        .office-country-card.nearest {
             border-color: #FFD700;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.2);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            position: relative;
+        }
+
+        .office-country-card.nearest::before {
+            content: 'Nearest Office';
+            position: absolute;
+            top: -12px;
+            right: 1rem;
+            background: #FFD700;
+            color: #0a0a0a;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
         }
 
         .remote-country-card {
@@ -427,20 +440,23 @@
                     { name: 'Porto', tz: 'Europe/Lisbon' },
                     { name: 'Coimbra', tz: 'Europe/Lisbon' },
                     { name: 'Aveiro', tz: 'Europe/Lisbon' }
-                ]
+                ],
+                coordinates: { lat: 40.6405, lng: -8.6538 }
             },
             { 
                 country: 'United Kingdom', 
                 cities: [
                     { name: 'Leicester', tz: 'Europe/London' },
                     { name: 'London', tz: 'Europe/London' }
-                ]
+                ],
+                coordinates: { lat: 51.5074, lng: -0.1278 }
             },
             { 
                 country: 'Romania', 
                 cities: [
                     { name: 'Cluj-Napoca', tz: 'Europe/Bucharest' }
-                ]
+                ],
+                coordinates: { lat: 46.7712, lng: 23.6236 }
             },
             { 
                 country: 'India', 
@@ -448,37 +464,43 @@
                     { name: 'Chennai (Kotturpuram)', tz: 'Asia/Kolkata' },
                     { name: 'Chennai (Thiruvanmiyur)', tz: 'Asia/Kolkata' },
                     { name: 'Bengaluru', tz: 'Asia/Kolkata' }
-                ]
+                ],
+                coordinates: { lat: 13.0827, lng: 80.2707 }
             },
             { 
                 country: 'Brazil', 
                 cities: [
                     { name: 'Blumenau', tz: 'America/Sao_Paulo' }
-                ]
+                ],
+                coordinates: { lat: -26.9194, lng: -49.0661 }
             },
             { 
                 country: 'United States', 
                 cities: [
                     { name: 'Los Angeles', tz: 'America/Los_Angeles' }
-                ]
+                ],
+                coordinates: { lat: 34.0522, lng: -118.2437 }
             },
             { 
                 country: 'Morocco', 
                 cities: [
                     { name: 'Casablanca', tz: 'Africa/Casablanca' }
-                ]
+                ],
+                coordinates: { lat: 33.5731, lng: -7.5898 }
             },
             { 
                 country: 'Vietnam', 
                 cities: [
                     { name: 'Ho Chi Minh', tz: 'Asia/Ho_Chi_Minh' }
-                ]
+                ],
+                coordinates: { lat: 10.8231, lng: 106.6297 }
             },
             { 
                 country: 'Australia', 
                 cities: [
                     { name: 'Melbourne', tz: 'Australia/Melbourne' }
-                ]
+                ],
+                coordinates: { lat: -37.8136, lng: 144.9631 }
             }
         ];
 
@@ -636,6 +658,55 @@
             return tzName;
         }
 
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Earth's radius in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        function findNearestOffice(userLat, userLng) {
+            let nearest = null;
+            let minDistance = Infinity;
+
+            officeTimezones.forEach((office, index) => {
+                const distance = calculateDistance(
+                    userLat, userLng,
+                    office.coordinates.lat, office.coordinates.lng
+                );
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    nearest = index;
+                }
+            });
+
+            return nearest;
+        }
+
+        let nearestOfficeIndex = null;
+
+        // Try to get user location
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    nearestOfficeIndex = findNearestOffice(
+                        position.coords.latitude,
+                        position.coords.longitude
+                    );
+                    // Re-render to highlight nearest office
+                    displayTimes();
+                },
+                (error) => {
+                    // Silently fail - just don't highlight any office
+                    console.log('Location access denied or unavailable');
+                }
+            );
+        }
+
         function displayTimes() {
             try {
                 const { date: referenceDate, timezone: referenceTimezone } = getTimeFromURL();
@@ -652,9 +723,14 @@
                 remoteGrid.innerHTML = '';
 
                 // Display office locations grouped by country
-                officeTimezones.forEach(country => {
+                officeTimezones.forEach((country, index) => {
                     const card = document.createElement('div');
                     card.className = 'office-country-card';
+                    
+                    // Highlight if this is the nearest office
+                    if (nearestOfficeIndex !== null && index === nearestOfficeIndex) {
+                        card.classList.add('nearest');
+                    }
                     
                     // Use the first city's timezone for the country (they should all be the same)
                     const tz = country.cities[0].tz;
