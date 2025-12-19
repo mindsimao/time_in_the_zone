@@ -400,7 +400,7 @@
                 <li><code>?time=14:30&office=Morocco</code> - Combine time and office parameters</li>
             </ul>
             <p style="color: #666; font-size: 0.85rem; margin-top: 1rem;">
-                Using <code>?office=</code> parameter will also highlight that office location.
+                The "Nearest Office" badge shows based on your geolocation, regardless of the reference timezone.
             </p>
         </div>
         
@@ -587,14 +587,13 @@
                 // Explicit timezone parameter takes priority
                 referenceTimezone = timezoneParam;
             } else if (officeParam) {
-                // Office parameter sets the timezone
+                // Office parameter sets the timezone for reference time calculation only
                 const officeIndex = officeTimezones.findIndex(
                     office => office.country.toLowerCase() === officeParam.toLowerCase()
                 );
                 if (officeIndex !== -1) {
                     referenceTimezone = officeTimezones[officeIndex].cities[0].tz;
-                    // Also set this as nearest for highlighting
-                    nearestOfficeIndex = officeIndex;
+                    // Don't override nearestOfficeIndex here - let geolocation handle highlighting
                 }
             }
             
@@ -748,23 +747,22 @@
             const params = new URLSearchParams(window.location.search);
             const officeParam = params.get('office');
             
-            // Only use geolocation if office parameter is not specified
-            if (!officeParam) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        nearestOfficeIndex = findNearestOffice(
-                            position.coords.latitude,
-                            position.coords.longitude
-                        );
-                        // Re-render to highlight nearest office
-                        displayTimes();
-                    },
-                    (error) => {
-                        // Silently fail - just don't highlight any office
-                        console.log('Location access denied or unavailable');
-                    }
-                );
-            }
+            // Use geolocation regardless of office parameter
+            // Office parameter only affects the reference timezone, not highlighting
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    nearestOfficeIndex = findNearestOffice(
+                        position.coords.latitude,
+                        position.coords.longitude
+                    );
+                    // Re-render to highlight nearest office
+                    displayTimes();
+                },
+                (error) => {
+                    // Silently fail - just don't highlight any office
+                    console.log('Location access denied or unavailable');
+                }
+            );
         }
 
         function displayTimes() {
