@@ -169,8 +169,7 @@
 
         .city-row {
             display: flex;
-            justify-content: space-between;
-            align-items: baseline;
+            flex-direction: column;
             padding: 0.5rem 0;
             border-bottom: 1px solid #1a1a1a;
         }
@@ -182,6 +181,13 @@
         .city-name {
             font-size: 0.9rem;
             color: #888;
+            margin-bottom: 0.25rem;
+        }
+
+        .city-time-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .city-time {
@@ -1059,9 +1065,9 @@
                         citiesHTML += `
                             <div class="city-row">
                                 <div class="city-name">${city.name}</div>
-                                <div>
+                                <div class="city-time-row">
                                     <span class="city-time" aria-label="Time in ${city.name}">${time}</span>
-                                    <span class="time-indicator ${timeStatus.status}" style="font-size: 0.7rem; padding: 0.2rem 0.5rem; margin-left: 0.5rem;" aria-label="Time status: ${timeStatus.label}">${timeStatus.label}</span>
+                                    <span class="time-indicator ${timeStatus.status}" style="font-size: 0.7rem; padding: 0.2rem 0.5rem;" aria-label="Time status: ${timeStatus.label}">${timeStatus.label}</span>
                                 </div>
                             </div>
                         `;
